@@ -332,20 +332,12 @@ window.Renderer = (function() {
             halfWidth: cfg.paddle.halfWidth, halfHeight: cfg.paddle.halfHeight };
     }
 
-    function drawPaddle(paddle, ball, local) {
+    function drawPaddle(paddle, local) {
         const p = point(paddle.x, paddle.y, paddle.z);
         const rx = p.scale * paddle.halfWidth, ry = p.scale * paddle.halfHeight;
         const handleAngle = local ? -Math.PI / 3 : Math.PI / 3;
         ctx.save(); ctx.translate(p.x, p.y);
-        // Depth ordering stays honest. Fade the local racket only where an
-        // incoming ball overlaps it, so the approach remains legible at contact.
-        if (local && ball && ball.phase === 'flying' && ball.vy < 0 && !ball.lastShotByPlayer && ball.y >= paddle.y) {
-            const b = point(ball.x, ball.y, ball.z), r = b.scale * ball.radius;
-            const dx = b.x - p.x, dy = b.y - p.y;
-            const cos = Math.cos(handleAngle), sin = Math.sin(handleAngle);
-            const across = dx * cos + dy * sin, down = dy * cos - dx * sin;
-            if (Math.abs(across) < rx + r && down > -ry - r && down < ry * 2.1 + r) ctx.globalAlpha = .32;
-        }
+        if (local) ctx.globalAlpha = .5;
         // The handle is decorative. Keep the face centred on its contact box.
         ctx.rotate(handleAngle);
         if (isPaddleImgLoaded) {
@@ -367,7 +359,8 @@ window.Renderer = (function() {
         const step = cfg.physics.fixedStep, floorZ = tableZ + ball.radius;
         const front = paddle.hitY + cfg.shot.paddleContactDepth;
         const bounced = ball.bounceCount === 1;
-        if (ball.y <= front || ball.bounceCount > 1) return null;
+        // Before the bounce, show where the ball would land on an unobstructed path.
+        if (ball.bounceCount > 1 || (bounced && ball.y <= front)) return null;
         let x = ball.x, y = ball.y, z = ball.z, vz = ball.vz;
         for (let i = 0; i < 180; i++) {
             const before = { x, y, z };
@@ -381,8 +374,7 @@ window.Renderer = (function() {
                 if (bounced || y <= nearY + ball.radius || y >= netY || Math.abs(x) > halfWidth - ball.radius) return null;
                 return { kind: 'bounce', x, y, z: tableZ + .003 };
             }
-            if (y <= front) {
-                if (!bounced) return null;
+            if (bounced && y <= front) {
                 const t = (front - before.y) / (y - before.y);
                 const target = { x: before.x + (x - before.x) * t, y: front, z: before.z + (z - before.z) * t };
                 // Reuse the real swept contact check, at the current stationary
@@ -408,15 +400,18 @@ window.Renderer = (function() {
         if (!guideCache || guideCache.key !== key || now - guideCache.time >= 1000 / 30) {
             guideCache = { key, time: now, value: predictGuide(ball, paddle) };
         }
-        // Do not leave a cached target behind the racket after the ball passes it.
+        if (guideCache.value?.kind === 'bounce') return guideCache.value;
+        // Drop a cached contact cue once the ball passes the racket.
         return ball.y > paddle.hitY + cfg.shot.paddleContactDepth ? guideCache.value : null;
     }
 
     function drawLanding(guide) {
         const p = point(guide.x, guide.y, guide.z);
         const rx = .06 * p.scale, ry = rx * .32;
-        ctx.save(); ctx.strokeStyle = lime; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.ellipse(p.x, p.y, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.save();
+        ctx.beginPath(); ctx.ellipse(p.x, p.y, rx, ry, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = '#0b1922bf'; ctx.lineWidth = 4.5; ctx.stroke();
+        ctx.strokeStyle = lime; ctx.lineWidth = 2.1; ctx.stroke();
         ctx.fillStyle = '#d5e87e16'; ctx.fill();
         line({ x: p.x - 3, y: p.y }, { x: p.x + 3, y: p.y }, lime, 1);
         ctx.restore();
@@ -536,12 +531,11 @@ window.Renderer = (function() {
         drawTableResponse(now);
         if (ball) drawBallShadow(ball);
         if (guideEnabled) drawDepthGuide(paddle, ball);
-        if (guide && guide.kind === 'bounce') drawLanding(guide);
         // Painter's order follows camera depth for every moving object. Ties put
         // the ball last (including held serves); a passed ball is in front of us.
         const layers = [{ y: netY, draw: () => drawNet(now) },
-            { y: paddle.y, draw: () => drawPaddle(paddle, ball, true) }];
-        if (opponent) layers.push({ y: opponent.y, draw: () => drawPaddle(opponent, null, false) });
+            { y: paddle.y, draw: () => drawPaddle(paddle, true) }];
+        if (opponent) layers.push({ y: opponent.y, draw: () => drawPaddle(opponent, false) });
         impacts.forEach(impact => {
             if (impact.type === 'racket') layers.push({ y: impact.y, draw: () => drawImpact(impact, now) });
         });
@@ -558,6 +552,7 @@ window.Renderer = (function() {
                 ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
                 ctx.closePath(); ctx.clip('evenodd');
             }
+            if (guide?.kind === 'bounce') drawLanding(guide);
             drawContactGuide(paddle, guide);
             ctx.restore();
         }
