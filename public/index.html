@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f2e9">
+    <meta name="description" content="A table for two. Create a room, invite a friend, and play a live match of Table Tennis Simulator. First to five, with a three-minute match limit.">
+    <title>Table Tennis Simulator</title>
+    <link rel="icon" href="assets/club-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="js/config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/audio.js"></script>
+    <script defer src="js/projection.js"></script>
+    <script defer src="js/cheat-mode.js"></script>
+    <script defer src="js/shot.js"></script>
+    <script defer src="js/paddle.js"></script>
+    <script defer src="js/ball.js"></script>
+    <script defer src="js/net.js"></script>
+    <script defer src="js/renderer.js"></script>
+    <script defer src="js/main.js"></script>
+</head>
+<body data-page="home">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="game-shell">
+        <header class="topbar">
+            <div class="brand">
+                <img class="brand-icon" src="assets/club-mark.svg" width="44" height="44" alt="">
+                <div><h1>Table Tennis <span>Simulator</span></h1><p class="brand-caption">The virtual table tennis club</p></div>
+            </div>
+            <div class="topbar-actions">
+                <div id="account-bar" class="account-bar" hidden>
+                    <span class="account-identity">Playing as <strong id="account-name"></strong></span>
+                    <button id="logout" class="text-button" type="button">Log out</button>
+                </div>
+                <div class="utility-actions" aria-label="Game settings and help">
+                    <button id="audio-toggle" class="utility-button" type="button" aria-pressed="false">Sound on</button>
+                    <button id="help-button" class="utility-button" type="button" aria-haspopup="dialog" aria-controls="controls-dialog">How to play <span aria-hidden="true">↗</span></button>
+                </div>
+            </div>
+        </header>
+        <main id="main-content" tabindex="-1">
+            <section id="home-page" aria-labelledby="home-title">
+                <div class="home-grid">
+                    <div class="club-intro">
+                        <p class="eyebrow"><span class="club-dot" aria-hidden="true"></span> A table for two</p>
+                        <h2 id="home-title">Good company.<br>Great <span class="headline-accent">rallies.</span></h2>
+                        <p class="intro-copy">Pull up a paddle. Invite a friend. <br>A little friendly competition starts here.</p>
+                        <div class="match-facts" aria-label="Match format">
+                            <div><strong>02</strong><span>Players</span></div>
+                            <div><strong>05</strong><span>Points to win</span></div>
+                            <div><strong>03<small> min</small></strong><span>Match limit</span></div>
+                        </div>
+                        <figure class="hero-art">
+                            <img src="assets/club-court.svg" width="720" height="256" alt="An illustrated table tennis court with a chartreuse paddle and a ball in flight.">
+                            <figcaption><span>THE CLUB COURT</span><span>One table. Two sides.</span></figcaption>
+                        </figure>
+                    </div>
+                    <div class="player-access">
+                        <section id="auth-panel" class="access-panel" aria-labelledby="access-title">
+                            <div class="panel-kicker"><span>PLAYER ACCESS</span><span>01 / JOIN THE CLUB</span></div>
+                            <h3 id="access-title">Your side of the table.</h3>
+                            <p class="panel-intro">Sign in, then meet your friend in a room.</p>
+                            <div class="auth-tabs" role="tablist" aria-label="Account form">
+                                <button id="login-tab" type="button" role="tab" aria-controls="login-form" aria-selected="true">Log in</button>
+                                <button id="register-tab" type="button" role="tab" aria-controls="register-form" aria-selected="false">Register</button>
+                            </div>
+                            <form id="login-form" role="tabpanel" aria-labelledby="login-tab">
+                                <label for="login-username">Username</label>
+                                <input id="login-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Your player name" required maxlength="20">
+                                <label for="login-password">Password</label>
+                                <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+                                <button class="primary-action" type="submit">Log in <span aria-hidden="true">↗</span></button>
+                            </form>
+                            <form id="register-form" role="tabpanel" aria-labelledby="register-tab" hidden>
+                                <label for="register-username">Username</label>
+                                <input id="register-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Choose a player name" required minlength="2" maxlength="20" aria-describedby="username-hint">
+                                <p id="username-hint" class="hint">2–20 letters, numbers, spaces, _ or -.</p>
+                                <label for="register-password">Password</label>
+                                <input id="register-password" name="password" type="password" autocomplete="new-password" placeholder="Choose a password" required minlength="4" maxlength="128" aria-describedby="password-hint">
+                                <p id="password-hint" class="hint">At least 4 characters.</p>
+                                <button class="primary-action" type="submit">Create account <span aria-hidden="true">↗</span></button>
+                            </form>
+                            <p id="auth-status" class="status" role="status" aria-atomic="true"></p>
+                            <p class="account-note">A local club membership: accounts are saved only in this browser. You stay signed in in this tab.</p>
+                        </section>
+                        <section id="lobby" class="access-panel" aria-labelledby="lobby-title" hidden>
+                            <div class="panel-kicker"><span>MATCH LOBBY</span><span>02 / TAKE YOUR PLACE</span></div>
+                            <h3 id="lobby-title" tabindex="-1">A friend. A friendly rival.</h3>
+                            <p class="panel-intro">Create a room and share the code, or join your friend at their table.</p>
+                            <button id="create-room" class="primary-action" type="button">Create a room <span aria-hidden="true">↗</span></button>
+                            <div class="lobby-divider"><span>or join a friend</span></div>
+                            <form id="join-form" class="join-form">
+                                <label for="room-code">Room code</label>
+                                <div class="join-actions">
+                                    <input id="room-code" name="room" minlength="6" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="A1B2C3" aria-describedby="room-code-hint" required>
+                                    <button id="join-room" class="secondary-action" type="submit">Join room</button>
+                                </div>
+                            </form>
+                            <p id="room-code-hint" class="hint">The six-character code your friend shares.</p>
+                            <div id="waiting-room" class="waiting-room" hidden>
+                                <span class="eyebrow">Your table is ready</span>
+                                <p class="waiting-instruction">Send this code to your friend.</p>
+                                <div class="room-code-row"><strong id="current-room-code"></strong><button id="copy-room-code" class="secondary-action" type="button">Copy code</button></div>
+                                <div class="room-seats"><span><i class="club-dot" aria-hidden="true"></i> You joined</span><span class="waiting-seat"><i aria-hidden="true"></i> Waiting for a friend</span></div>
+                                <p>Keep this page open. Your match starts when your friend joins.</p>
+                                <p id="copy-status" class="hint" role="status" aria-atomic="true"></p>
+                                <button id="cancel-room" class="text-button" type="button">Leave room</button>
+                            </div>
+                            <p id="room-status" class="status" role="status" aria-atomic="true"></p>
+                        </section>
+                    </div>
+                </div>
+                <section class="playbook" aria-labelledby="instructions-title">
+                    <div class="playbook-title"><p class="eyebrow">THE SHORT VERSION</p><h3 id="instructions-title">Less setup. <br>More table time.</h3></div>
+                    <ol class="quick-start">
+                        <li><span class="step-number" aria-hidden="true">01</span><div><strong>Meet at the same table.</strong><p>Create a room. Share its code with a friend.</p></div></li>
+                        <li><span class="step-number" aria-hidden="true">02</span><div><strong>Find your rhythm.</strong><p>Move with WASD. Press Space when it’s your serve.</p></div></li>
+                        <li><span class="step-number" aria-hidden="true">03</span><div><strong>Make the next point yours.</strong><p>One bounce, then return. First to five wins.</p></div></li>
+                    </ol>
+                </section>
+            </section>
+            <section id="game-page" aria-label="Table tennis match" hidden>
+                <header class="match-toolbar">
+                    <span class="room-label"><span class="club-dot" aria-hidden="true"></span> LIVE MATCH <span class="separator" aria-hidden="true">/</span> <strong id="match-room-code"></strong></span>
+                    <button id="leave-room" class="text-button" type="button">Leave match <span aria-hidden="true">↗</span></button>
+                </header>
+                <div class="scoreboard" aria-label="Match score">
+                    <div id="player-score-card" class="score-card"><div class="player-identity"><span id="player-name">You</span><small>YOU <em id="player-serving" hidden>Serving</em></small></div><strong id="player-score">0</strong></div>
+                    <div class="match-clock"><span id="match-format" role="status" aria-live="polite">FIRST TO 5</span><time id="match-time">3:00</time><span>TIME REMAINING</span></div>
+                    <div id="opponent-score-card" class="score-card opponent-card"><div class="player-identity"><span id="opponent-name">Opponent</span><small>OPPONENT <em id="opponent-serving" hidden>Serving</em></small></div><strong id="opponent-score">0</strong></div>
+                </div>
+                <div class="feedback-slot"><div id="match-feedback" class="match-feedback" role="status" aria-live="polite" aria-atomic="true"></div></div>
+                <div class="game-layout">
+                    <div id="court-stage" class="court-stage">
+                        <div class="court-status-bar"><div id="match-status" class="hud-status" role="status" aria-live="off">Waiting for the serve…</div><span class="rally-label">RALLY <span id="rally-count">0</span></span></div>
+                        <div id="game-frame" class="game-frame"><canvas id="game-canvas" width="960" height="600" tabindex="0" aria-label="Live table tennis court. Use W and S to move forward and back, A and D to move sideways, and Space to serve." aria-describedby="court-help">Your browser does not support Canvas. Please use a browser that supports Canvas to play.</canvas></div>
+                        <div class="court-caption"><span>YOUR SIDE OF THE TABLE</span><div id="cheat-status" class="hud-cheat">CHEAT OFF · C to enable</div></div>
+                    </div>
+                    <aside class="game-controls" aria-label="Match controls">
+                        <div class="controls-heading"><p class="eyebrow">YOUR NEXT MOVE</p><h3>Play the point.</h3></div>
+                        <button id="serve-button" class="primary-action" type="button">Serve <kbd>Space</kbd></button>
+                        <p id="court-help" class="control-tip">Line up early with WASD. The ball returns automatically when it meets your racket after one bounce.</p>
+                        <div id="touch-controls" class="touch-controls" role="group" aria-label="Paddle movement. Hold a button to move.">
+                            <button type="button" data-move="KeyW" aria-label="Move paddle forward, W"><span aria-hidden="true">↑</span><span>W</span></button>
+                            <button type="button" data-move="KeyA" aria-label="Move paddle left, A"><span aria-hidden="true">←</span><span>A</span></button>
+                            <button type="button" data-move="KeyS" aria-label="Move paddle back, S"><span aria-hidden="true">↓</span><span>S</span></button>
+                            <button type="button" data-move="KeyD" aria-label="Move paddle right, D"><span aria-hidden="true">→</span><span>D</span></button>
+                        </div>
+                        <p class="movement-caption">Hold to move · WASD or buttons</p>
+                        <div class="assist-controls"><button id="return-guide" class="toggle-button" type="button" aria-pressed="true">Return guide on</button><button id="toggle-cheat" class="toggle-button" type="button" aria-pressed="false">Cheat off</button></div>
+                        <p class="assist-note"><span><strong>Blue marks</strong> track the ball’s depth.</span><span><strong>Dashed line</strong> marks your racket’s depth.</span><span><strong>Ring</strong> predicts the first bounce.</span><span><strong>Cross</strong> predicts where to meet the ball.</span></p>
+                    </aside>
+                </div>
+            </section>
+            <section id="match-result" class="result-page" aria-labelledby="result-title" hidden>
+                <div class="result-heading"><p class="eyebrow"><span class="club-dot" aria-hidden="true"></span> MATCH COMPLETE</p><span class="result-edition">THE CLUB / MATCH REPORT</span></div>
+                <div class="result-summary"><div><h2 id="result-title" tabindex="-1">A match well played.</h2><p id="result-reason" class="result-reason"></p><p id="result-detail"></p></div><div class="final-score"><span>FINAL SCORE · YOU / OPPONENT</span><div id="result-score" class="result-score" aria-label="Final score">0 : 0</div></div></div>
+                <dl class="result-metrics" aria-label="Match statistics">
+                    <div><dt>Match duration</dt><dd><span id="result-duration">—</span></dd></div>
+                    <div><dt>Longest rally</dt><dd><span id="result-longest-rally">—</span> <small>returns</small></dd></div>
+                    <div><dt>Points played</dt><dd><span id="result-total-rallies">—</span></dd></div>
+                </dl>
+                <div class="results-table-wrap" tabindex="0" role="region" aria-label="Match ranking. Scroll horizontally on small screens.">
+                    <table class="results-table"><caption>The scorebook</caption><thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">Points</th><th scope="col">Returns</th><th scope="col">Serves</th><th scope="col">Faults</th></tr></thead><tbody id="result-ranking"></tbody></table>
+                </div>
+                <div class="result-bottom"><p>There’s always another rally.</p><div class="result-actions"><button id="restart-match" class="primary-action" type="button">Play again <span aria-hidden="true">↗</span></button><button id="return-lobby" class="secondary-action" type="button">Back to the lobby</button></div></div>
+                <p id="result-status" class="status" role="status" aria-atomic="true"></p>
+            </section>
+        </main>
+        <footer class="club-footer"><span class="footer-brand">GOOD COMPANY. GREAT RALLIES.</span><div class="connection-meta"><span id="connection-status" class="connection-status" role="status">Connecting to the club…</span><span id="latency-status" class="latency-status" aria-live="off"></span></div></footer>
+    </div>
+    <dialog id="controls-dialog" aria-labelledby="controls-title" aria-describedby="guide-live-note">
+        <div class="dialog-header"><p class="eyebrow">THE CLUB PLAYBOOK</p><button id="close-controls" class="utility-button" type="button" autofocus>Close <span aria-hidden="true">×</span></button></div>
+        <h2 id="controls-title">Find your rhythm.</h2>
+        <p id="guide-live-note" class="live-match-note">Live matches keep running while this guide is open.</p>
+        <dl class="controls-list">
+            <div><dt><kbd>A</kbd> <kbd>D</kbd></dt><dd><strong>Move sideways. Shape your return.</strong> Line up with the incoming ball. Moving left or right as you meet it changes the return angle.</dd></div>
+            <div><dt><kbd>W</kbd> <kbd>S</kbd></dt><dd><strong>Move forward or back.</strong> Push forward with W for a faster return; pull back with S for a slower one. Position early, then make a small adjustment as the ball arrives.</dd></div>
+            <div><dt><kbd>Space</kbd></dt><dd><strong>Serve when it’s your turn.</strong> Position your paddle, then press Space or select Serve. After a point, wait for the serving indicator before starting again.</dd></div>
+            <div><dt><kbd>C</kbd></dt><dd><strong>Toggle cheat mode.</strong> Your returns glow gold and change direction when they bounce on your opponent’s half. Toggle off to stop further deflections and remove the glow.</dd></div>
+        </dl>
+        <div class="guide-notes"><section><h3>Timing is the game.</h3><p>Let the ball bounce once on your half, then meet it with your paddle. Contact makes the return automatically; there is no separate swing button. Aim to return over the net onto your opponent’s half.</p></section><section><h3>Mouse or touch works, too.</h3><p>Press and hold the directional buttons to move. Select Serve to start a point, Cheat to toggle the effect, and Return guide to show or hide the landing and contact aid.</p></section></div>
+        <section class="guide-rules"><h3>Read the return guide.</h3><p>Compare the blue marks for the ball’s current depth with the green line for your racket. The ring predicts the first bounce. The cross predicts where the ball reaches your racket, and the brackets mark the contact zone. A cheat deflection changes the prediction after the bounce.</p></section>
+        <section class="guide-rules"><h3>Five points. Three minutes.</h3><p>A miss, double bounce, double touch, or invalid return loses the point. First to 5 wins. At the 3-minute limit, the higher score wins; equal scores are a draw.</p></section>
+    </dialog>
+    <audio id="sound-racket" preload="auto" src="assets/racket-hit.wav"></audio>
+    <audio id="sound-table" preload="auto" src="assets/table-bounce.wav"></audio>
+</body>
+</html>

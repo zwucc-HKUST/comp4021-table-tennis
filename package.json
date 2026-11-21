@@ -1,0 +1,17 @@
+{
+  "name": "first-person-table-tennis",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A modular multiplayer table-tennis game for COMP4021",
+  "scripts": {
+    "start": "node game_server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
+  }
+}

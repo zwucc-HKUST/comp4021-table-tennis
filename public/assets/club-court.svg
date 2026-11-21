@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 256" fill="none">
+  <title>The club court</title><desc>A graphic table tennis court in forest green, with a chartreuse paddle and an airborne ball.</desc>
+  <defs><pattern id="net-grid" width="10" height="9" patternUnits="userSpaceOnUse"><path d="M0 0H10V9" stroke="#b6c8a0" stroke-width=".7"/></pattern><pattern id="rubber-dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".8" fill="#53621e" opacity=".45"/></pattern></defs>
+  <path d="M0 238H720" stroke="#cdd1bf"/><circle cx="578" cy="121" r="109" fill="#e7e9dc"/><path d="M548 26V216M483 121H679" stroke="#d2d7c3"/>
+  <ellipse cx="311" cy="228" rx="252" ry="13" fill="#dfe2d2"/>
+  <path d="M120 150L114 225H127L144 150M458 136L489 224H502L483 135" fill="#405343"/>
+  <path d="M45 137L258 44L542 126L323 228Z" fill="#172c23"/>
+  <path d="M45 128L258 35L542 117L323 219Z" fill="#355644" stroke="#edf0df" stroke-width="2"/>
+  <path d="M57 128L258 42L529 117L322 211Z" stroke="#edf0df" stroke-width="2"/><path d="M153 82L431 164M182 172L395 79" stroke="#e0e8d5" stroke-width="1.5"/>
+  <path d="M179 172V132L400 35V76Z" fill="#172c23" fill-opacity=".92"/><path d="M179 172V132L400 35V76Z" fill="url(#net-grid)"/>
+  <path d="M176 175V129L402 31V79M179 133L400 37" stroke="#f1f2de" stroke-width="3"/><path d="M176 130V179M403 32V82" stroke="#20362a" stroke-width="5"/>
+  <path d="M282 89C345-9 449-12 513 49" stroke="#718145" stroke-width="1.5" stroke-dasharray="4 7"/>
+  <ellipse cx="303" cy="117" rx="10" ry="4" fill="#1b3629" fill-opacity=".5"/><circle cx="286" cy="79" r="11" fill="#fffef9" stroke="#293c2b" stroke-width="1.5"/><path d="M280 75Q282 71 286 71" stroke="#d8ddcb" stroke-width="1.5" stroke-linecap="round"/>
+  <g transform="translate(578 114) rotate(32)"><path d="M-10 42L-9 113Q0 123 9 113L10 42" fill="#b18a56" stroke="#273125" stroke-width="2"/><path d="M-4 64V111M4 64V111" stroke="#e8d0a8" stroke-width="2"/><ellipse cy="4" rx="48" ry="58" fill="#203629" stroke="#263625" stroke-width="2"/><ellipse rx="48" ry="58" fill="#d5f34a" stroke="#273125" stroke-width="2"/><ellipse rx="43" ry="53" fill="url(#rubber-dots)"/><path d="M-24-27Q0-45 24-27" stroke="#485726" stroke-width="1.5"/><path d="M-13 31H13M-8 36H8" stroke="#485726" stroke-width="2"/></g>
+  <path d="M15 18H67M15 18V36M705 224H653M705 224V206" stroke="#8a9476"/>
+</svg>

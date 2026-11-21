@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="340" viewBox="-120 -120 240 340">
+  <!-- Face [-100,100] maps to the 20cm collider. Handle is cosmetic. -->
+  <defs>
+    <linearGradient id="wood" x1="0" x2="1"><stop stop-color="#8a6241"/><stop offset=".24" stop-color="#e5c69a"/><stop offset=".52" stop-color="#b48e60"/><stop offset=".8" stop-color="#f0d7ad"/><stop offset="1" stop-color="#795037"/></linearGradient>
+    <linearGradient id="rubber" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#bf4754"/><stop offset=".45" stop-color="#9d293d"/><stop offset="1" stop-color="#641b30"/></linearGradient>
+    <radialGradient id="light" cx=".28" cy=".18" r=".85"><stop stop-color="#ffdfc1" stop-opacity=".12"/><stop offset="1" stop-color="#ffdfc1" stop-opacity="0"/></radialGradient>
+    <pattern id="pores" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".6" fill="#2e0d1e" opacity=".25"/><circle cx="1.6" cy="1.6" r=".35" fill="#ffceb1" opacity=".17"/></pattern>
+  </defs>
+  <path d="M-17 76 Q-13 131-23 200 Q0 214 23 200 Q13 131 17 76Z" fill="#171f21" stroke="#d1b089" stroke-width="3"/>
+  <path d="M-13 85 Q-9 139-18 197 Q0 204 18 197 Q9 139 13 85Z" fill="url(#wood)"/>
+  <path d="M-4 99 -6 199 M5 99 8 198" fill="none" stroke="#69472f" stroke-opacity=".55" stroke-width="2"/>
+  <path d="M-16 177 17 177 19 195 Q0 202-19 195Z" fill="#192729"/>
+  <path d="M-8 185 8 185" stroke="#d5e87e" stroke-width="3"/>
+  <ellipse rx="105" ry="105" cy="2" fill="#11191b" stroke="#ddc29b" stroke-width="3"/>
+  <circle r="101" fill="#dfc49e"/><circle r="100" fill="url(#rubber)"/>
+  <circle r="99" fill="url(#pores)"/><circle r="98" fill="url(#light)" stroke="#ed9c98" stroke-opacity=".28"/>
+  <path d="M-74-59 A94 94 0 0 1 52-78" fill="none" stroke="#ffe2c4" stroke-opacity=".35" stroke-width="1.4"/>
+  <path d="M-12 59 -5 48 M-2 59 5 48 M8 59 15 48" fill="none" stroke="#f0c6b6" stroke-opacity=".45" stroke-width="2"/>
+  <path d="M-19 70 23 70" stroke="#efc7b8" stroke-opacity=".3"/>
+</svg>
